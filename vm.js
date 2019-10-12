@@ -10,7 +10,7 @@ const fun = (a) => (b) => (v) => ({
     toString: () => `(fun ${a} ${force(b({...v, [a]: undefined})).toString()})`
 });
 const sym = (a) => (v) => v[a] || fix((c) => (s) => ({
-    apply: (x) => delay(()=>c(`(app ${s} ${x.toString()})`)),
+    apply: (x) => delay(() => c(`(app ${s} ${x.toString()})`)),
     toString: () => s
 }))(a);
 const app = (a) => (b) => (v) => (a(v)).apply(b(v));
@@ -27,7 +27,7 @@ const language = Parsimmon.createLanguage({
 	["body", r.Program],
 	Parsimmon.optWhitespace,
 	Parsimmon.string(")")
-    ).map((m)=>fun(m.argument)(m.body)),
+    ).map((m) => fun(m.argument)(m.body)),
     Application: (r) => Parsimmon.seqObj(
 	Parsimmon.string("("),
 	Parsimmon.optWhitespace,
@@ -38,7 +38,7 @@ const language = Parsimmon.createLanguage({
 	["second", r.Program],
 	Parsimmon.optWhitespace,
 	Parsimmon.string(")")
-    ).map((m)=>app(m.first)(m.second)),
+    ).map((m) => app(m.first)(m.second)),
     Program: (r) => Parsimmon.alt(
 	r.Symbol,
 	r.Function,
