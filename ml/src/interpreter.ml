@@ -9,8 +9,6 @@ type applicable = {
     string: string;
 }
 
-let rec fix f x = f (fix f) x
-
 let rec execute operations position valuation =
     match Array.get operations position with
     | Fop (operand1, operand2) -> {
