@@ -2,15 +2,16 @@ import babel from 'rollup-plugin-babel';
 import node from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import { terser } from 'rollup-plugin-terser';
+
 export default {
-    input: 'vm.js',
+    input: 'vm.ts',
     output: {
-	format: 'commonjs'
+        format: 'commonjs'
     },
     plugins: [
-	commonjs(),
-	node(),
-	babel(),
-	terser()
+	    commonjs(),
+        node(),
+        babel({ extensions: ['.ts', '.js'] }),
+        terser()
     ]
 };
