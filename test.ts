@@ -1,5 +1,6 @@
+import { parse } from "./src/parser";
 import { compile, dump, read } from "./src/compiler";
-import { run as runCompiled } from "./src/vm";
+import { run as runBinary } from "./src/vm";
 import { run as runString } from "./src/interpreter";
 
 let code = `
@@ -25,5 +26,11 @@ let code = `
         )
         (F y (S z))
     )`
-console.log(runString(code).toString());
-//console.log(run(read(dump(compile(code)))).toString());
+const ast = parse(code);
+console.time("Interpreter");
+console.log(runString(ast).toString());
+console.timeEnd("Interpreter");
+const binary = compile(ast);
+console.time("Compiler");
+console.log(runBinary(binary).toString());
+console.timeEnd("Compiler");

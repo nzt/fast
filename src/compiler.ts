@@ -1,62 +1,30 @@
-import Parsimmon from "parsimmon";
 import { Operation } from "./vm";
+import { parse } from "./parser";
 
-export const compile = (s: string): Operation[] => {
+export const compile = (ast: ReturnType<typeof parse>): Operation[] => {
     const indexer = (function*() {
         for(let i = 0;; i++) {
             yield i;
         }
     })();
-
-    const language = Parsimmon.createLanguage({
-        Symbol: () =>
-            Parsimmon
-                .seqObj<{symbol: string}>(
-                    Parsimmon.string("("),
-                    Parsimmon.optWhitespace,
-                    Parsimmon.string("S"),
-                    Parsimmon.optWhitespace,
-                    ["symbol", Parsimmon.regexp(/[a-zA-Z]/)],
-                    Parsimmon.optWhitespace,
-                    Parsimmon.string(")")
-                )
-                .map((m): Operation[] =>[{index: indexer.next().value, opcode: "S", operand: [m.symbol.charCodeAt(0),0]}]),
-        Function: (r) => 
-            Parsimmon
-                .seqObj<{argument: string, body: Operation[]}>(
-                    Parsimmon.string("("),
-                    Parsimmon.optWhitespace,
-                    Parsimmon.string("F"),
-                    Parsimmon.optWhitespace,
-                    ["argument", Parsimmon.regexp(/[a-z]+/)],
-                    Parsimmon.optWhitespace,
-                    ["body", Parsimmon.alt(r.Symbol, r.Function, r.Application)],
-                    Parsimmon.optWhitespace,
-                    Parsimmon.string(")")
-                )
-                .map((m): Operation[] => [{ index: indexer.next().value, opcode: "F", operand: [m.body[0].index, m.argument.charCodeAt(0)] }, ...m.body]),
-        Application: (r) =>
-            Parsimmon
-                .seqObj<{[k:string]: Operation[]}>(
-                    Parsimmon.string("("),
-                    Parsimmon.optWhitespace,
-                    Parsimmon.string("A"),
-                    Parsimmon.optWhitespace,
-                    ["first", Parsimmon.alt(r.Symbol, r.Function, r.Application)],
-                    Parsimmon.optWhitespace,
-                    ["second", Parsimmon.alt(r.Symbol, r.Function, r.Application)],
-                    Parsimmon.optWhitespace,
-                    Parsimmon.string(")")
-                )
-                .map((m): Operation[] => [{ index: indexer.next().value, opcode: "A", operand: [m.first[0].index, m.second[0].index] }, ...m.first, ...m.second]),
-        Toplevel: (r) =>
-            Parsimmon
-                .alt(r.Symbol, r.Function, r.Application)
-                .trim(Parsimmon.optWhitespace)
-                .map((toplevel): Operation[] =>[{index: indexer.next().value, opcode: "T", operand: [toplevel[0].index, 0]}, ...toplevel].sort((a, b)=>(a.index - b.index)))
-    });
-
-    return language.Toplevel.tryParse(s);
+    const generate = (ast: ReturnType<typeof parse>): Operation[] => {
+        switch (ast[0]) {
+            case "F": {
+                const t = generate(ast[2]);
+                return [{index: indexer.next().value, opcode: ast[0], operand: [t[0].index, ast[1].charCodeAt(0)]}, ...t]
+            }
+            case "A": {
+                const t = generate(ast[1]);
+                const u = generate(ast[2]);
+                return [{ index: indexer.next().value, opcode: ast[0], operand: [t[0].index, u[0].index] }, ...t, ...u]
+            }
+            case "S": {
+                return [{index: indexer.next().value, opcode: ast[0], operand: [ast[1].charCodeAt(0),0]}]
+            }
+        }
+    }
+    const op = generate(ast);
+    return [{index: indexer.next().value, opcode: "T", operand: [op[0].index, 0]}, ...op].sort((a, b)=>a.index - b.index)
 };
 
 export const dump = (op: Operation[]) => {

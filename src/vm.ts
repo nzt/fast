@@ -7,7 +7,7 @@ const fix = <A, B>(f: (g: (x: A) => B) => (x: A) => B) => (x: A): B => f(fix(f))
 export interface Operation {
     index: number;
     opcode: string;
-    operand: [number, number];
+    operand: number[];
 }
 
 interface Applicable {
