@@ -4,9 +4,9 @@ import commonjs from 'rollup-plugin-commonjs';
 import { terser } from 'rollup-plugin-terser';
 
 export default {
-    input: 'vm.ts',
+    input: './src/compiler.ts',
     output: {
-        format: 'commonjs'
+        format: 'esm'
     },
     plugins: [
 	    commonjs(),

@@ -1,6 +1,6 @@
-import { compile, dump, read } from "./compiler";
-import { run as runCompiled } from "./vm";
-import { run as runString } from "./interpreter";
+import { compile, dump, read } from "./src/compiler";
+import { run as runCompiled } from "./src/vm";
+import { run as runString } from "./src/interpreter";
 
 let code = `
     (A
