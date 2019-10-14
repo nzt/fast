@@ -19,7 +19,7 @@ export const compile = (ast: ReturnType<typeof parse>): Operation[] => {
                 return [{ index: indexer.next().value, opcode: ast[0], operand: [t[0].index, u[0].index] }, ...t, ...u]
             }
             case "S": {
-                return [{index: indexer.next().value, opcode: ast[0], operand: [ast[1].charCodeAt(0),0]}]
+                return [{ index: indexer.next().value, opcode: ast[0], operand: [ast[1].charCodeAt(0),0]}]
             }
         }
     }
