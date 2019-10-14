@@ -11,6 +11,14 @@ let rec expression_to_string ex =
     | ListExp l -> "(" ^ (String.concat " " (List.map expression_to_string l)) ^ ")"
     | SymbolExp s -> s
 
+let rec cps_transform s =
+    match s with
+    | ListExp [SymbolExp "F"; SymbolExp operand1; ListExp operand2] ->
+        ListExp [SymbolExp "F"; SymbolExp "k"; ListExp [SymbolExp "A"; ListExp [SymbolExp "S"; SymbolExp "k"]; ListExp [SymbolExp "F"; SymbolExp operand1; cps_transform(ListExp operand2)]]]
+    | ListExp [SymbolExp "S"; SymbolExp operand1] ->
+        ListExp [SymbolExp "F"; SymbolExp "k"; ListExp [SymbolExp "A"; ListExp [SymbolExp "S"; SymbolExp "k"]; ListExp [SymbolExp "S"; SymbolExp operand1]]]
+    | _ -> raise (Invalid_operation (expression_to_string s))
+
 let rec generate s i =
     match s with
     | ListExp [SymbolExp "F"; SymbolExp operand1; ListExp operand2] ->
