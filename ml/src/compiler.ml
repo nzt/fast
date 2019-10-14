@@ -11,13 +11,18 @@ let rec expression_to_string ex =
     | ListExp l -> "(" ^ (String.concat " " (List.map expression_to_string l)) ^ ")"
     | SymbolExp s -> s
 
-let rec cps_transform s =
-    match s with
-    | ListExp [SymbolExp "F"; SymbolExp operand1; ListExp operand2] ->
-        ListExp [SymbolExp "F"; SymbolExp "k"; ListExp [SymbolExp "A"; ListExp [SymbolExp "S"; SymbolExp "k"]; ListExp [SymbolExp "F"; SymbolExp operand1; cps_transform(ListExp operand2)]]]
-    | ListExp [SymbolExp "S"; SymbolExp operand1] ->
-        ListExp [SymbolExp "F"; SymbolExp "k"; ListExp [SymbolExp "A"; ListExp [SymbolExp "S"; SymbolExp "k"]; ListExp [SymbolExp "S"; SymbolExp operand1]]]
-    | _ -> raise (Invalid_operation (expression_to_string s))
+let rec cps_transform e =
+    let f a b = ListExp [SymbolExp "F"; SymbolExp a; b] in
+    let a a b = ListExp [SymbolExp "A"; a; b] in
+    let s a = ListExp [SymbolExp "S"; SymbolExp a] in
+        match e with
+        | ListExp [SymbolExp "F"; SymbolExp operand1; ListExp operand2] ->
+            f "k" (a (s "k") (f "x" (cps_transform (ListExp operand2))))
+        | ListExp [SymbolExp "S"; SymbolExp operand1] ->
+            f "k" (a (s "k") (s operand1))
+        | ListExp [SymbolExp "A"; ListExp operand1; ListExp operand2] ->
+            f "k" (a (cps_transform (ListExp operand1)) (f "m" (a (cps_transform (ListExp operand2)) (f "n" (a (a (s "m") (s "n")) (s "k"))))))
+        | _ -> raise (Invalid_operation (expression_to_string e))
 
 let rec generate s i =
     match s with
