@@ -1,0 +1,13 @@
+./src/compiler.cmo : ./src/compiler.cmi
+./src/compiler.cmx : ./src/compiler.cmi
+./src/compiler.cmi :
+./src/interpreter.cmo : ./src/interpreter.cmi
+./src/interpreter.cmx : ./src/interpreter.cmi
+./src/interpreter.cmi :
+./src/lexer.cmo :
+./src/lexer.cmx :
+./src/main.cmo :
+./src/main.cmx :
+./src/parser.cmo : ./src/parser.cmi
+./src/parser.cmx : ./src/parser.cmi
+./src/parser.cmi :
