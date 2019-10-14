@@ -1,8 +1,18 @@
 type operation = 
-| Fop of (int * int)
-| Aop of (int * int)
-| Sop of (int * int)
-| Top of (int * int)
+| F of (int * int)
+| A of (int * int)
+| S of (int * int)
+| T of (int * int)
+
+let string_to_operation op =
+    match op with
+    | F(a, b) -> Printf.printf "F %03d %03d\n" a b
+    | A(a, b) -> Printf.printf "A %03d %03d\n" a b
+    | S(a, b) -> Printf.printf "S %03d %03d\n" a b
+    | T(a, b) -> Printf.printf "T %03d %03d\n" a b 
+
+let string_to_operations op =
+    Array.iter string_to_operation op
 
 type applicable = {
     apply: applicable -> applicable;
@@ -17,16 +27,16 @@ let rec unbound string =
 
 let rec execute operations position valuation =
     match Array.get operations position with
-    | Fop (operand1, operand2) -> 
+    | F (operand1, operand2) -> 
         let variable = Char.escaped (Char.chr operand1) in 
             {
                 apply = (fun x -> execute operations operand2 ((operand1, x)::valuation));
                 string = ("(F " ^ variable ^ " " ^ (execute operations operand2 (List.remove_assoc operand1 valuation)).string ^ ")");
             }
-    | Aop (operand1, operand2) -> 
+    | A (operand1, operand2) -> 
         (execute operations operand1 valuation).apply (execute operations operand2 valuation)
-    | Sop (operand1, _) ->
+    | S (operand1, _) ->
         (try List.assoc operand1 valuation with
             | Not_found -> unbound ("(S " ^ (Char.escaped (Char.chr operand1)) ^ ")"))
-    | Top (operand1, _) ->
+    | T (operand1, _) ->
         execute operations operand1 valuation

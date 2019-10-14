@@ -1,6 +1,5 @@
 type expression =
-| Fexp of (string * expression)
-| Aexp of (expression * expression)
-| Sexp of (string)
+| SymbolExp of string
+| ListExp of expression list
 
 val compile: expression -> Interpreter.operation array

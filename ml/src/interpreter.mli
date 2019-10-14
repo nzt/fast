@@ -1,8 +1,8 @@
 type operation = 
-| Fop of (int * int)
-| Aop of (int * int)
-| Sop of (int * int)
-| Top of (int * int)
+| F of (int * int)
+| A of (int * int)
+| S of (int * int)
+| T of (int * int)
 
 type applicable = {
     apply: applicable -> applicable;
