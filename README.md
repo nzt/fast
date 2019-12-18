@@ -1,6 +1,6 @@
-# Lize
+# FAST
 
-Lize is an experimental programming language for the experiment of lambda calculus.
+FAST is an experimental programming language for the experiment of lambda calculus.
 
 ## FAST IR
 
